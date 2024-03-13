@@ -21,6 +21,7 @@ author: The Charlotte OS Team
 
 navbar-links:
   Home: "/"
+  Design Doc: "design"
   Resources:
     - OSDev Wiki: "https://wiki.osdev.org/Main_Page"
     - Learn Rust: "https://www.rust-lang.org/learn/"
@@ -32,8 +33,8 @@ navbar-links:
 
 # Image to show in the navigation bar - works best with a square image
 # Remove this parameter if you don't want an image in the navbar
-avatar: "/assets/img/avatar-icon.png"
-#avatar: "/assets/img/charlotte.jpg"
+# avatar: "/assets/img/avatar-icon.png"
+avatar: "/assets/img/charlotte-logo.png"
 
 # By default, the image is cut into a circle. You can disable this behaviour by setting 'round-avatar: false'
 round-avatar: true
