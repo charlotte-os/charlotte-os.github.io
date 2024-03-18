@@ -74,7 +74,8 @@ title: Charlotte OS Design Document
 - Tracks processes and their resources (the kernel has no concept of process at all)
 - Handles all user management
 - Enforces security policy by withholding capabilities when appropriate.
-- Assigns ownership of global resources like the framebuffer to the services configured to manage them
+- Assigns ownership of global resources to the services configured to manage them.
+    - For example the framebuffer would be assigned to the program configured to be the compositor.
 
 ## Namespace
 
@@ -84,16 +85,16 @@ title: Charlotte OS Design Document
 - Paths in the namespace are URIs with the following format `sns://addr/path`
 	- `sns`: The subnamespace to be accessessed
 	- `addr`: Some means of identifying the host on which to look for the given path in the given subnamespace. If omitted, localhost is assumed.
-	- `path`: The path the to the object or directory being referenced
-- The filesystem is a subnamespace that is implemented by the OS itself.
-- Processes with the appropriate permissions can create and mount their own subnamespaces into the system namespace
+	- `path`: The path to the object or directory being referred to.
+- The filesystem will be a subnamespace that is implemented by the OS itself via a filesystem service.
+- Processes with the appropriate permissions can create and mount their own subnamespaces into the system namespace although certain SNS names will be reserved for use exclusively by privileged OS services.
 
 ## User Interface
 
-#### Overview: The system will provide two user interfaces, a text shell and a graphical UI for users to interact with it.
+#### Overview: The system will provide two user interfaces, a text shell and a graphical UI for users to interact with.
 
 - Text UI
 	- A rich TUI that allows users to interact with the system.
 	- The programming interface for the TUI should be richer than curses or conio and potentially allow a mouse to be used
 - Graphical UI
-	- A widget based UI modelled after the KDE Plasma Desktop but made perhaps made more multitouch friendly
+	- A widget based UI modelled after the KDE Plasma Desktop but made more multitouch friendly
