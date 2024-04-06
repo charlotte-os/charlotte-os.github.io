@@ -1,3 +1,61 @@
-<p>
-    <img src="assets/img/charlotteos-qemu_smaller.png" alt="CharlotteOS booted in QEMU" class="mx-auto d-block">
-<p>
+<div class="row">
+    <p>
+        <img src="assets/img/charlotteos-qemu_smaller.png" alt="CharlotteOS booted in QEMU" class="mx-auto d-block">
+    </p>
+
+    <div>
+        <h1 id="charlotte-core">Charlotte Core</h1>
+        <h3 id="the-kernel-of-charlotteos">The Kernel of CharlotteOS</h3>
+      
+        <p>Charlotte Core is a hybrid operating system kernel developed as a part of CharlotteOS.</p>
+      
+        <h3 id="status">Status</h3>
+      
+        <p>Charlotte Core is in very early development. Run it at your own risk.</p>
+      
+        <h3 id="implementation-languages">Implementation Languages</h3>
+        
+        <p>Charlotte Core is written in Rust and Assembly language</p>
+        
+        <h3 id="target-platforms">Target Platforms</h3>
+        
+        <ul>
+            <li>x86-64 PCs with UEFI and ACPI (In Progress)</li>
+            <li>Aarch64 devices with UEFI and ACPI (In Progress)</li>
+            <li>RISC-V devices with UEFI and ACPI (Not under active development yet)</li>
+        </ul>
+        
+        <h3 id="building-and-testing">Building and Testing</h3>
+        
+        <p>When you first clone this respository make sure to run the following commands to ensure that the git submodules are initialized and up to date:</p>
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git submodule init
+        git submodule update
+        </code></pre></div></div>
+        
+        <h4 id="building">Building</h4>
+        <p>The following commands are used to build the debug and release versions of the kernel.</p>
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make build-x86_64-debug    <span class="c"># debug</span>
+        make build-x86_64-release  <span class="c"># release</span>
+        </code></pre></div></div>
+        <h4 id="testing">Testing</h4>
+        
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make run-x86_64-debug    <span class="c"># For testing a debug build in qemu</span>
+        make run-x86_64-release  <span class="c"># For testing a release build in qemu</span>
+        </code></pre></div></div>
+        
+        <p>The <code class="language-plaintext highlighter-rouge">x86_64</code> portion of any of the previous commands can be replaced with <code class="language-plaintext highlighter-rouge">aarch64</code> or <code class="language-plaintext highlighter-rouge">riscv64</code> to build the kernel for the Arm and RISC-V architectures respectively however it should be noted that support for these ISAs is much less complete
+        than for x86_64 for the time being.</p>
+        
+        <h3 id="documentation">Documentation</h3>
+        
+        <p>Detailed documentation will eventually be available on the project’s wiki and website.</p>
+        
+        <h3 id="contributing">Contributing</h3>
+        
+        <p>Contributions are welcome and highly appreciated. Please create a new branch for your work and submit a pull request on GitHub. Make sure to rebase all your changes on master to maintain a linear commit history avoiding merge commits to the extent possible.</p>
+
+        
+    </div>
+
+</div>
+
