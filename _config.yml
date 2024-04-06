@@ -20,12 +20,17 @@ author: The Charlotte OS Team
 ###############################################
 
 navbar-links:
-  Home: "/"
+# Home: "/"
   Design Doc: "design"
+  GitHub: "https://github.com/charlotte-os"
   Resources:
     - OSDev Wiki: "https://wiki.osdev.org/Main_Page"
     - Learn Rust: "https://www.rust-lang.org/learn/"
-  About Charlotte: "about"
+  Find Us: 
+    - Discord: "https://discord.com/invite/Kd2XJugp"
+    - Reddit: "https://www.reddit.com/r/CharlotteOS"
+    - Email: "mailto:charlotte-os@outlook.com"
+# About Charlotte: "about"
 
 ################
 # --- Logo --- #
@@ -60,7 +65,7 @@ social-network-links:
 #  patreon: DeanAttali
 #  youtube: "@daattali"
 #  medium: yourname
-#  reddit: yourname
+#  reddit: r/CharlotteOS
 #  linkedin: daattali
 #  xing: yourname
 #  stackoverflow: "3943160/daattali"
