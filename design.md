@@ -1,100 +1,104 @@
 ---
 layout: page
-title: Charlotte OS Design Document
-# subtitle: Kitty go purrrrrrrrrrr!
+title: CharlotteOS Design Document
 ---
+
+# CharlotteOS Design Document
 
 ## General
 
-- Design Goals
-	- Ease of use for nontechnical users
-	- Ease of troubleshooting for both technical and nontechnical users
-	- Ease of developing applications
-	- Providing an erognomic environment for developers
-	- Making the system itself easy to hack on
-		- Ensure all OS code is well organized and well documented
-- MPL 2.0 License used when possible
-- Include features that each set of target users care about
-- Provide a modern set of user interfaces
-	- Create a good looking and well optimized native Rust UI
-		- Widget based GUI inspired by KDE Plasma
-	- Create a modern and easy to use text shell
-		- More feature rich API than curses and conio
-		- Potentially allow mouse usage
+### Design Goals
+- Ensure ease of use for non-technical users.
+- Facilitate easy troubleshooting for both technical and non-technical users.
+- Simplify the development of applications.
+- Provide an ergonomic environment for developers.
+- Make the system straightforward to modify (hackability).
+  - Ensure all OS code is well-organized and well-documented.
+- Use the GPL 3.0 License wherever possible.
+- Include features valued by different target user groups.
+- Deliver a modern set of user interfaces.
+  - Develop a visually appealing and well-optimized native Rust UI.
+    - Widget-based GUI inspired by KDE Plasma.
 
 ## Kernel - Charlotte Core
 
-#### Overview: The kernel will provide mechanisms to make use of hardware resources and it will enforce the policies set by privileged userspace software.
+### Overview
+The kernel facilitates access to hardware resources and enforces policies set by privileged user-space software.
 
-- Hybrid Kernel
-	- Kernel extensions run as privileged processes in userspace
-	- Drivers can be compiled into the kernel or run as kernel extensions
-- Memory Management
-	- MMU required
-	- Physical Memory Manager
-		- Tracks used and unused page frames
-		- Tracks number of page frames that may be needed but have not yet been allocated
-	- Virtual Menmory Manager
-		- An interface provided by the arch module in the kernel to abstract over ISA specific page map management operations
-		- Operations
-			- Create a new page map
-			- Delete an existing page map
-			- Add mappings to an existing page map
-			- Remove mappings from an existing page map
-			- Set or clear pages' present bits
-			- Change MMU permissions on one or more page(s) in a given page map
-		- Given the number of ISA specific operations involved this subsystem is best implemented in arch on a per ISA basis
-		and abstracted to a common interface.
-- Thread Scheduling
-	- TBD
-- ACPI
-	- Static tables are parsed using custom code
-	- AML interpretation will be performed using Rust bindings to LAI, the Lightweight AML Interprer
-- System Call Interface
-	- The system call interface will use a `target-action-arguments` pattern for extensibility and ease of use
-		- `target`: Either an OS subsystem or capability
-		- `action`: The requested action for the kernel to perform
-		- `arguments`: Any other information needed to perform the requested action
-- Kernel Bus (kbus)
-	- Intercontext communication mechanism backed by kernel shared memory
-	- Provides full duplex communication channels
-	- Capabale of unicast and multicast communication
-	- Broadcast is not allowed for performance and security reasons
-	- Provides the only way to send capabilities between contexts
+#### Modular Monolithic Kernel
+- Drivers and kernel modules must use the same compiler version as the kernel they target.
+- Each kernel release will explicitly specify the compiler version used for its build, ensuring that all modules are compatible.
+- Charlotte Core does not guarantee internal stability; module developers are responsible for ensuring compatibility with new kernel releases.
+- If module authors wish to use languages other than Rust, they must provide their own C FFI wrapper module to serve as an interface. This wrapper ensures that the module can communicate with the kernel while using the language of the author’s choice.
+- The package manager will facilitate easier integration and management of modules, streamlining updates and compatibility checks.
+
+#### Memory Management
+- MMU Required by target system
+- **Physical Memory Manager**
+  - Tracks used and unused page frames using a simple bitmap.
+  - Tracks the number of frames that may be needed later for CoW and demand paging.
+- **Virtual Memory Manager**
+  - Provided by the arch module to abstract ISA-specific page map management operations.
+  - Operations include creating and deleting page maps, adding/removing mappings, and managing MMU permissions and other settings on pages.
+  - On the x86-64 ISA, this includes handling MTRRs and PATs
+
+#### Thread Scheduling
+- Single scheduler tunable for either latency or throughput.
+- Uses a preemptive form of Dynamic Quantum Round Robin as the primary scheduling algorithm to achieve weighted fair scheduling.
+
+#### ACPI
+- Parse static tables using custom code.
+- Integrates Rust bindings to uACPI for AML interpretation.
+
+#### System Call Interface
+- Employs a target-action-arguments pattern for extensibility and ease of use.
+  - Target: An OS subsystem or capability.
+  - Action: The requested action for the kernel to perform.
+  - Arguments: Additional information needed to execute the action.
+
+#### Kernel Bus (kbus)
+- Handles interprocess communication.
+- Provides full duplex communication channels capable of unicast and multicast (broadcasting is prohibited).
+- Facilitates capability transfer between contexts and supports both local (via shared memory buffers) and remote (using WebSockets) communications.
 
 ## Executive Service - Charlotte Exec
 
-#### Overview: The executive service is the primary userspace portion of the operating system. It controls all system configuration, handles process management, user management and implements the configured security policy. It is also responsible for starting and stopping all other system services including kernel extension services.
-- Is given all possible capabilities at system startup and has the responsibility of providing or denying processes capabilities upon request.
-- Manages all system services and kernel extension services.
-- Creates and launches all new processes by default.
-- Can operate as an OOM killer if configured to do so.
-- Makes all necessary privileged system calls to configure the kernel to enforce system policies
-- Reads the configuration changes automatically from the namespace and implements the requested changes
-- Tracks processes and their resources (the kernel has no concept of process at all)
-- Handles all user management
-- Enforces security policy by withholding capabilities when appropriate.
-- Assigns ownership of global resources to the services configured to manage them.
-    - For example the framebuffer would be assigned to the program configured to be the compositor.
+### Overview
+The primary user-space portion of the OS, handling system configuration, process and user management, and security policy enforcement.
+
+- Can grants or revoke any capability.
+- Manages all system services and acts as an OOM killer when configured to do so.
+- Automatically reads and implements configuration changes.
+- Enforces security policy by managing capability access.
+- Assigns ownership of global resources to designated management services (e.g., framebuffer to the compositor).
 
 ## Namespace
 
-#### Overview: The system namespace is a heirarchical directory of entries that represent a variety of differnt things in the system. It is used to enumerate and interact with almost all system resources and components.
+### Overview
+A hierarchical structure used to enumerate and interact with nearly all system resources and components.
 
-- Implemented by the namespace service which should be a direct child of the executive service
-- Paths in the namespace are URIs with the following format `sns://addr/path`
-	- `sns`: The subnamespace to be accessessed
-	- `addr`: Some means of identifying the host on which to look for the given path in the given subnamespace. If omitted, localhost is assumed.
-	- `path`: The path to the object or directory being referred to.
-- The filesystem will be a subnamespace that is implemented by the OS itself via a filesystem service.
-- Processes with the appropriate permissions can create and mount their own subnamespaces into the system namespace although certain SNS names will be reserved for use exclusively by privileged OS services.
+- Managed by the namespace subsystem of the kernel.
+- Paths in the namespace are formatted as `sns://host/path`.
+  - **sns**: Subnamspace, a section within the namespace that serves a particular pu
+  - **Host**: Identifier for the host; defaults to localhost if omitted.
+  - **Path**: The specific object or directory referenced.
+- The filesystem is a subnamespace
+  - The CharlotteOS filesystem will be a custom single rooted filesystem with support for multi-user ownership semantics, file descriptor capabilities, journaling, snapshots, compression, and softwre RAID.
+  - The OS will also fully support the exFAT filesystem for use with removable storage media.
 
 ## User Interface
 
-#### Overview: The system will provide two user interfaces, a text shell and a graphical UI for users to interact with.
+### Overview
+The primary user interaction with the system is through a graphical shell.
 
-- Text UI
-	- A rich TUI that allows users to interact with the system.
-	- The programming interface for the TUI should be richer than curses or conio and potentially allow a mouse to be used
-- Graphical UI
-	- A widget based UI modelled after the KDE Plasma Desktop but made more multitouch friendly
+- CharlotteOS will be a GUI first operating system
+  - Widget-based UI modeled after the KDE Plasma Desktop.
+  - Includes robust support for remote desktop functionality using a secure protocol.
+- Terminal mode will be supported for environments where a GUI is not desirable or possible.
+  - Can be shown on a display or made available via serial or SSH over a network
+
+## Command Shell
+- Provides an easy to use but also scriptable command shell
+- Shell scripts inspired by assembly code with each command to be esecuted on a separate line with its operands
+  - Control flow will be possible via branch commands
+  - This will make it easy to generate shell scripts on the fly

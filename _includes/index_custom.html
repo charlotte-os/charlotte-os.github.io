@@ -6,13 +6,14 @@
     <div>
         <h1 id="charlotte-core">Charlotte Core</h1>
         <h3 id="the-kernel-of-charlotteos">The Kernel of CharlotteOS</h3>
-      
-        <p>Charlotte Core is a hybrid operating system kernel developed as a part of CharlotteOS.</p>
-      
+        
+        <p>Charlotte Core is the kernel of CharlotteOS. It will be a modular monolithic kernel that maps hardware devices to a set of paravirtualized hardware
+        interfaces exposed to userspace applications. Higher level abstractions will be provided by system libraries as with an exokernel.</p>
+        
         <h3 id="status">Status</h3>
-      
+        
         <p>Charlotte Core is in very early development. Run it at your own risk.</p>
-      
+        
         <h3 id="implementation-languages">Implementation Languages</h3>
         
         <p>Charlotte Core is written in Rust and Assembly language</p>
@@ -20,18 +21,11 @@
         <h3 id="target-platforms">Target Platforms</h3>
         
         <ul>
-            <li>x86-64 PCs with UEFI and ACPI (In Progress)</li>
-            <li>Aarch64 devices with UEFI and ACPI (In Progress)</li>
-            <li>RISC-V devices with UEFI and ACPI (Not under active development yet)</li>
+        <li>x86-64 PCs with UEFI and ACPI (Under active development)</li>
+        <li>Aarch64 devices with UEFI and ACPI (Under limited development)</li>
+        <li>RISC-V devices with UEFI and ACPI (Not presently under development, maintainer wanted)</li>
         </ul>
-        
-        <h3 id="building-and-testing">Building and Testing</h3>
-        
-        <p>When you first clone this respository make sure to run the following commands to ensure that the git submodules are initialized and up to date:</p>
-        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git submodule init
-        git submodule update
-        </code></pre></div></div>
-        
+
         <h4 id="building">Building</h4>
         <p>The following commands are used to build the debug and release versions of the kernel.</p>
         <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make build-x86_64-debug    <span class="c"># debug</span>
@@ -43,8 +37,33 @@
         make run-x86_64-release  <span class="c"># For testing a release build in qemu</span>
         </code></pre></div></div>
         
-        <p>The <code class="language-plaintext highlighter-rouge">x86_64</code> portion of any of the previous commands can be replaced with <code class="language-plaintext highlighter-rouge">aarch64</code> or <code class="language-plaintext highlighter-rouge">riscv64</code> to build the kernel for the Arm and RISC-V architectures respectively however it should be noted that support for these ISAs is much less complete
-        than for x86_64 for the time being.</p>
+        <p>The <code class="language-plaintext highlighter-rouge">x86_64</code> portion of any of the previous commands can be replaced with <code class="language-plaintext highlighter-rouge">aarch64</code> or <code class="language-plaintext highlighter-rouge">riscv64</code> to build the kernel for the Arm and RISC-V architectures respectively however it should be noted that support for these ISAs is much less complete than for x86_64 for the time being.</p>
+        
+        <h4 id="gdb-debug-probe">GDB debug probe</h4>
+        <p>Follow the steps in the <code class="language-plaintext highlighter-rouge">Building</code> section above, replacing <code class="language-plaintext highlighter-rouge">make run-x86_64-debug</code> for <code class="language-plaintext highlighter-rouge">run-x86_64-debugprobe</code>, this will start qemu, but it will appear unresponsive
+        this is because it’s waiting for gdb to connect, on linux this can be achieved by in another terminal running:</p>
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gdb charlotte_core/target/x86_64-unknown-none/debug/charlotte_core
+        </code></pre></div></div>
+        
+        <p>and once gdb is open:</p>
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(gdb) target remote localhost:1234
+        make sure to set some breakpoints or the code will just go straight to the halt at the end of main currently
+        (gdb) c
+        </code></pre></div></div>
+        <p><em>OR</em>
+        Use the .gdbinit file present in the repo, to do this you need to allow gdb to load the .gdbinit file,
+        this can be accomplished by adding <code class="language-plaintext highlighter-rouge">add-auto-load-safe-path [path to the repo here]/.gdbinit</code> to <code class="language-plaintext highlighter-rouge">$HOME/.config/gdb/gdbinit</code>, wit this done you just need to run:</p>
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># in terminal 1</span>
+        make run-x86_64-debugprobe
+        <span class="c"># in another terminal</span>
+        gdb
+        </code></pre></div></div>
+        
+        <p>If you are currently in the repo main folder you may use the snippet bellow to add the loading allow to gdbinit.</p>
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.config/gdb/<span class="p">;</span><span class="nb">echo</span> <span class="s2">"add-auto-load-safe-path </span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span><span class="s2">/.gdbinit"</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/.config/gdb/gdbinit
+        </code></pre></div></div>
+        
+        <p>Further reference <a href="https://qemu-project.gitlab.io/qemu/system/gdb.html">Qemu GDB docs</a></p>
         
         <h3 id="documentation">Documentation</h3>
         
@@ -53,7 +72,6 @@
         <h3 id="contributing">Contributing</h3>
         
         <p>Contributions are welcome and highly appreciated. Please create a new branch for your work and submit a pull request on GitHub. Make sure to rebase all your changes on master to maintain a linear commit history avoiding merge commits to the extent possible.</p>
-
         
     </div>
 

@@ -10,10 +10,10 @@
 ############################
 
 # Name of website
-title: Charlotte OS
+title: CharlotteOS
 
 # Your name to show in the footer
-author: The Charlotte OS Team
+author: The CharlotteOS Team
 
 ###############################################
 # --- List of links in the navigation bar --- #
@@ -30,7 +30,7 @@ navbar-links:
     - Discord: "https://discord.com/invite/Kd2XJugp"
     - Reddit: "https://www.reddit.com/r/CharlotteOS"
     - Email: "mailto:charlotte-os@outlook.com"
-# About Charlotte: "about"
+  About CharlotteOS: "about"
 
 ################
 # --- Logo --- #
@@ -90,7 +90,7 @@ social-network-links:
 
 # If you want your website to generate an RSS feed, provide a description
 # The URL for the feed will be https://<your_website>/feed.xml
-rss-description: Get the latest news and posts about Charlotte OS.
+rss-description: Get the latest news and posts about CharlotteOS.
 
 ###########################
 # --- General options --- #
